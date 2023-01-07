@@ -1,0 +1,8 @@
+.bg-dim-gray {
+    background: #f9f9f9;
+}
+
+main > .container {
+    margin-top: 64px;
+    margin-bottom: 8px;
+}
