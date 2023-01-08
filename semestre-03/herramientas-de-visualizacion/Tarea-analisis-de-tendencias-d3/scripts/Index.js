@@ -14,7 +14,7 @@ const svg = graph
     .append("svg")
     .attr("width", totalWidth)
     .attr("height", totalHeight)
-    .attr("class", "fig")
+    .attr("class", "bg-figure")
 
 const g = svg
     .append("g")
@@ -31,14 +31,14 @@ const year = g
     .append("text")
     .attr("x", width / 2)
     .attr("y", height / 2)
-    .attr("class", "year")
+    .attr("class", "bg-date-text")
 
 g.append("rect")
     .attr("x", "0")
     .attr("y", "0")
     .attr("width", width)
     .attr("height", height)
-    .attr("class", "grupo")
+    .attr("class", "grp")
 
 const x = d3.scaleLinear().range([0, width])
 const y = d3.scaleLinear().range([height, 0])
@@ -83,9 +83,9 @@ const load = async () => {
     console.log(iy)
     g.append("g")
         .attr("transform", `translate(0, ${height})`)
-        .attr("class", "ejes")
+        .attr("class", "axis")
         .call(xAxis)
-    g.append("g").attr("class", "ejes").call(yAxis)
+    g.append("g").attr("class", "axis").call(yAxis)
 
     g.append("text")
         .attr("x", (width / 2)-75)
