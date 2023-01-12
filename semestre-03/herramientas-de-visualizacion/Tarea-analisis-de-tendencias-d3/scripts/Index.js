@@ -1,62 +1,63 @@
-const graph = d3.select("#graph-expected-production")
-const tooltip = d3.select("#tooltip")
-const power_station = d3.select("#power-station")
-const monitored_cap = d3.select("#monitored-cap")
-const btnAnimation = d3.select("#btnAnimation")
 
-const margins = { left: 75, top: 40, right: 10, bottom: 50 }
-const totalWidth = +graph.style("width").slice(0, -2)
-const totalHeight = (totalWidth * 9) / 16
-const width = totalWidth - margins.left - margins.right
-const height = totalHeight - margins.top - margins.bottom
+const luis_graph = d3.select("#graph-expected-production")
+const luis_tooltip = d3.select("#luis-tooltip")
+const luis_power_station = d3.select("#luis-power-station")
+const luis_monitored_cap = d3.select("#luis-monitored-cap")
+const luis_btnAnimation = d3.select("#luis-btnAnimation")
 
-const svg = graph
+const luis_margins = { left: 75, top: 40, right: 10, bottom: 50 }
+const luis_totalWidth = +luis_graph.style("width").slice(0, -2)
+const luis_totalHeight = (luis_totalWidth * 9) / 16
+const luis_width = luis_totalWidth - luis_margins.left - luis_margins.right
+const luis_height = luis_totalHeight - luis_margins.top - luis_margins.bottom
+
+const luis_svg = luis_graph
     .append("svg")
-    .attr("width", totalWidth)
-    .attr("height", totalHeight)
+    .attr("width", luis_totalWidth)
+    .attr("height", luis_totalHeight)
     .attr("class", "bg-figure")
 
-const g = svg
+const luis_g = luis_svg
     .append("g")
-    .attr("transform", `translate(${margins.left}, ${margins.top})`)
+    .attr("transform", `translate(${luis_margins.left}, ${luis_margins.top})`)
 
-const clip = g
+const luis_clip = luis_g
     .append("clipPath")
     .attr("id", "clip")
     .append("rect")
-    .attr("width", width)
-    .attr("height", height)
+    .attr("width", luis_width)
+    .attr("height", luis_height)
 
-const year = g
+const luis_year = luis_g
     .append("text")
-    .attr("x", width / 2)
-    .attr("y", height / 2)
+    .attr("x", luis_width / 2)
+    .attr("y", luis_height / 2)
     .attr("class", "bg-date-text")
 
-g.append("rect")
+luis_g.append("rect")
     .attr("x", "0")
     .attr("y", "0")
-    .attr("width", width)
-    .attr("height", height)
+    .attr("width", luis_width)
+    .attr("height", luis_height)
     .attr("class", "grp")
 
-const x = d3.scaleLinear().range([0, width])
-const y = d3.scaleLinear().range([height, 0])
-const A = d3.scaleLinear().range([20, 70600])
-const continent = d3.scaleOrdinal().range(d3.schemeSet2)
+const luis_x = d3.scaleLinear().range([0, luis_width])
+const luis_y = d3.scaleLinear().range([luis_height, 0])
+const luis_A = d3.scaleLinear().range([20, 70600])
+const luis_continent = d3.scaleOrdinal().range(d3.schemeSet2)
 
-const xAxis = d3.axisBottom(x).tickSize(-height)
-const yAxis = d3.axisLeft(y).tickSize(-width)
+const luis_xAxis = d3.axisBottom(luis_x).tickSize(-luis_height)
+const luis_yAxis = d3.axisLeft(luis_y).tickSize(-luis_width)
 
-var parseTime = d3.timeParse('%d/%M/%Y')
+var luis_parseTime = d3.timeParse('%d/%M/%Y')
 
-var iy, miny, maxy
-var animating = false
-var interval
-var v_power_station
+var luis_iy, luis_miny, luis_maxy
+var luis_animating = false
+var luis_interval
+var luis_v_power_station
 
-const load = async () => {
-    data = await d3.csv(
+const luis_load = async () => {
+    luis_data = await d3.csv(
         "https://raw.githubusercontent.com/MrLuisLagarda/unir_masters_degree/main/semestre-03/herramientas-de-visualizacion/Tarea-analisis-de-tendencias-d3/data/PowerGeneration.csv",
         //d3.autoType
         function(d) {
@@ -69,68 +70,66 @@ const load = async () => {
             }
         }
     )
-    data = d3.filter(data, (d) => d.actual != null && d.expected != null)
+    luis_data = d3.filter(luis_data, (d) => d.actual != null && d.expected != null)
 
-    x.domain(d3.extent(data, (d) => d.actual))
-    y.domain(d3.extent(data, (d) => d.expected))
-    A.domain(d3.extent(data, (d) => d.monitored_cap))
-    continent.domain(Array.from(new Set(data.map((d) => d.power_station))))
+    luis_x.domain(d3.extent(luis_data, (d) => d.actual))
+    luis_y.domain(d3.extent(luis_data, (d) => d.expected))
+    luis_A.domain(d3.extent(luis_data, (d) => d.monitored_cap))
+    luis_continent.domain(Array.from(new Set(luis_data.map((d) => d.power_station))))
 
-    console.log(data)
-    miny = d3.min(data, (d) => moment(d.dates, 'M/D/yyyy'))
-    maxy = d3.max(data, (d) => moment(d.dates, 'M/D/yyyy'))
-    iy = moment(miny).format('M/D/yyyy')
-    console.log(iy)
-    g.append("g")
-        .attr("transform", `translate(0, ${height})`)
+    luis_miny = d3.min(luis_data, (d) => moment(d.dates, 'M/D/yyyy'))
+    luis_maxy = d3.max(luis_data, (d) => moment(d.dates, 'M/D/yyyy'))
+    luis_iy = moment(luis_miny).format('M/D/yyyy')
+    
+    luis_g.append("g")
+        .attr("transform", `translate(0, ${luis_height})`)
         .attr("class", "axis")
-        .call(xAxis)
-    g.append("g").attr("class", "axis").call(yAxis)
+        .call(luis_xAxis)
+    luis_g.append("g").attr("class", "axis").call(luis_yAxis)
 
-    g.append("text")
-        .attr("x", (width / 2)-75)
-        .attr("y", height + 40)
+    luis_g.append("text")
+        .attr("x", (luis_width / 2)-75)
+        .attr("y", luis_height + 40)
         .attr("text-widthr", "middle")
         .attr("class", "labels")
-        .text("Actual Energy Generated (MU)")
+        .text("Energía Generada (MU)")
 
-    g.append("g")
-        .attr("transform", `translate(-40, ${(height / 2)+135})`)
+    luis_g.append("g")
+        .attr("transform", `translate(-40, ${(luis_height / 2)+135})`)
         .append("text")
         .attr("transform", "rotate(-90)")
         .attr("text-widthr", "middle")
         .attr("class", "labels")
-        .text("Expected Energy To Generate (MU)")
+        .text("Energía que se Planeó Generar (MU)")
 
-    render(data)
+    luis_render(luis_data)
 }
 
-const render = (data) => {
-    console.log(iy)
-    const newData = d3.filter(data, (d) => d.dates == iy)
-
-    const circle = g.selectAll("circle").data(newData, (d) => d.power_station)
+const luis_render = (luis_data) => {
     
-    circle
+    const luis_newData = d3.filter(luis_data, (d) => d.dates == luis_iy)
+
+    const luis_circle = luis_g.selectAll("circle").data(luis_newData, (d) => d.power_station)
+    
+    luis_circle
         .enter()
         .append("circle")
         .attr("fill", "#00FF0088")
         .attr("stroke", "#00000088")
         .attr("clip-path", "url(#clip)")
-        .attr("cx", (d) => x(d.actual))
-        .attr("cy", (d) => y(d.expected))
+        .attr("cx", (d) => luis_x(d.actual))
+        .attr("cy", (d) => luis_y(d.expected))
         .attr("r", 0)
-        .on("click", (_, d) => showTooltip(d))
-        // .on("mouseout", () => hideTooltip())
-        .merge(circle)
+        .on("click", (_, d) => luis_showTooltip(d))
+        .merge(luis_circle)
         .transition()
         .duration(250)
-        .attr("cx", (d) => x(d.actual))
-        .attr("cy", (d) => y(d.expected))
-        .attr("r", (d) => Math.sqrt((A(d.monitored_cap) /2 )/ Math.PI))
-        .attr("fill", (d) => continent(d.power_station) + "88")
+        .attr("cx", (d) => luis_x(d.actual))
+        .attr("cy", (d) => luis_y(d.expected))
+        .attr("r", (d) => Math.sqrt((luis_A(d.monitored_cap) /2 )/ Math.PI))
+        .attr("fill", (d) => luis_continent(d.power_station) + "88")
 
-    circle
+    luis_circle
         .exit()
         .transition()
         .duration(250)
@@ -138,73 +137,70 @@ const render = (data) => {
         .attr("fill", "#ff000088")
         .remove()
 
-    year.text(moment(iy).format('DD/MMM/yyyy'))
+    luis_year.text(moment(luis_iy).format('DD/MMM/yyyy'))
 
-    d = newData.filter((d) => d.power_station == v_power_station)[0]
-    if (d != null) {
-        tooltip.style("left", x(d.actual) + "px").style("top", y(d.expected) + "px")
-        power_station.text(d.power_station)
-        monitored_cap.text(d.monitored_cap)
+    luis_d = luis_newData.filter((d) => d.power_station == luis_v_power_station)[0]
+    if (luis_d != null) {
+        luis_tooltip.style("left", x(d.actual) + "px").style("top", y(d.expected) + "px")
+        luis_power_station.text(d.power_station)
+        luis_monitored_cap.text(d.monitored_cap)
     }
 }
 
-const showTooltip = (d) => {
-    v_power_station = d.power_station
+const luis_showTooltip = (d) => {
+    luis_v_power_station = d.power_station
 
-    tooltip
-        .style("left", x(d.actual) + "px")
-        .style("top", y(d.expected) + "px")
+    luis_tooltip
+        .style("left", luis_x(d.actual) + "px")
+        .style("top", luis_y(d.expected) + "px")
         .style("display", "block")
-    power_station.text(d.power_station)
-    monitored_cap.text(d.monitored_cap)
+    luis_power_station.text(d.power_station)
+    luis_monitored_cap.text(d.monitored_cap)
 }
 
-const hideTooltip = () => {
-    tooltip.style("display", "none")
+const luis_hideTooltip = () => {
+    luis_tooltip.style("display", "none")
 }
 
-const delta = (d) => {
-    //iy += d
-    iy = moment(iy, 'M/D/yyyy').add(d, 'd').format('M/D/yyyy')
-    if (moment(iy, 'M/D/yyyy') > maxy) {
-        clearInterval(interval)
-        animating = false
-        btnAnimation
+const luis_delta = (d) => {
+    luis_iy = moment(luis_iy, 'M/D/yyyy').add(d, 'd').format('M/D/yyyy')
+    if (moment(luis_iy, 'M/D/yyyy') > luis_maxy) {
+        clearInterval(luis_interval)
+        luis_animating = false
+        luis_btnAnimation
             .classed("btn-success", true)
             .classed("btn-danger", false)
             .html("<i class='fas fa-play'></i>")
-        iy = moment(maxy).format('M/D/yyyy')
+        luis_iy = moment(luis_maxy).format('M/D/yyyy')
     }
-    else if (moment(iy, 'M/D/yyyy') < miny) {
-        iy = moment(miny).format('M/D/yyyy')
+    else if (moment(luis_iy, 'M/D/yyyy') < luis_miny) {
+        luis_iy = moment(luis_miny).format('M/D/yyyy')
     }
 
-    render(data)
+    luis_render(luis_data)
 }
 
-const toggleAnimation = () => {
-    animating = !animating
-    if (animating) {
-        btnAnimation
+const luis_toggleAnimation = () => {
+    luis_animating = !luis_animating
+    if (luis_animating) {
+        luis_btnAnimation
             .classed("btn-success", false)
             .classed("btn-danger", true)
             .html("<i class='fas fa-pause'></i>")
 
-        interval = setInterval(() => delta(1), 50)
+        luis_interval = setInterval(() => luis_delta(1), 50)
     } else {
-        btnAnimation
+        luis_btnAnimation
             .classed("btn-success", true)
             .classed("btn-danger", false)
             .html("<i class='fas fa-play'></i>")
 
-        clearInterval(interval)
+        clearInterval(luis_interval)
     }
 }
 
-
-
-function init() {
-    load()
+function luis_init() {
+    luis_load()
 }
 
-init()
+luis_init()

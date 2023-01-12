@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Power Generation in India</title>
+  <title>Generación de Energía en la India</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
     integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -38,31 +38,34 @@
   </nav>
   <main class="flex-grow-1 d-flex">
     <div class="container pt-60 flex-grow-1 bg-white border-gray shadow">
-      <h1 class="border-bottom">Power Generation in India</h1>
+      <h1 class="border-bottom">Generación de Energía en la India</h1>
       <div class="d-flex flex-row align-items-center">
-        <h4 class="mb-0">Expected VS Production Timelapse</h4>
-        <div class="ms-2 me-auto">
-          <button onclick="delta(-1)" class="btn btn-secondary btn-sm">
-            <i class="fas fa-caret-left"></i>
-          </button>
-          <button onclick="toggleAnimation()" class="btn btn-primary" id="btnAnimation">
-            <i class="fas fa-play"></i>
-          </button>
-          <button onclick="delta(1)" class="btn btn-secondary btn-sm">
-            <i class="fas fa-caret-right"></i>
-          </button>
+        <h4 class="mb-0">Históricamente. ¿Cuál es la relación existente entre la energía planeada y la producida, a nivel día?</h4>
+      </div>
+      <div class="row">
+        <div class="col-12 d-flex">
+          <div class="ms-auto">
+            <button onclick="luis_delta(-1)" class="btn btn-secondary btn-sm">
+              <i class="fas fa-caret-left"></i>
+            </button>
+            <button onclick="luis_toggleAnimation()" class="btn btn-primary" id="luis-btnAnimation">
+              <i class="fas fa-play"></i>
+            </button>
+            <button onclick="luis_delta(1)" class="btn btn-secondary btn-sm">
+              <i class="fas fa-caret-right"></i>
+            </button>
+          </div>
         </div>
       </div>
-
       <div class="row">
         <div class="col-12">
           <div id="graph-expected-production" style="position: relative">
-            <div class="p-2 bg-danger text-warning rounded shadow-sm" id="tooltip"
-              style="position: absolute; display: none" onclick="hideTooltip()">
+            <div class="p-2 bg-primary text-white rounded shadow-sm" id="luis-tooltip"
+              style="position: absolute; display: none" onclick="luis_hideTooltip()">
               <p>
-                Power Station: <span id="power-station"><strong>xxxxx</strong></span>
+                Power Station: <span id="luis-power-station"><strong></strong></span>
                 <br />
-                Monitored Cap: <span id="monitored-cap"><strong>xxxxx</strong></span>
+                Monitored Cap: <span id="luis-monitored-cap"><strong></strong></span>
               </p>
             </div>
           </div>
