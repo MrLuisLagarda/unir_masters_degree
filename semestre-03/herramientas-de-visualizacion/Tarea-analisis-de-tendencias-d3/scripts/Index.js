@@ -1,16 +1,18 @@
-
+//Variables  estaticas en codigo html
 const luis_graph = d3.select("#graph-expected-production")
-const luis_tooltip = d3.select("#luis-tooltip")
-const luis_power_station = d3.select("#luis-power-station")
-const luis_monitored_cap = d3.select("#luis-monitored-cap")
+const luis_tooltip = d3.select("#luis-tooltip")                 //div con el tooltip que sera reposicionado segun sea necesario
+const luis_power_station = d3.select("#luis-power-station")     //label para especificar la planta de energia
+const luis_monitored_cap = d3.select("#luis-monitored-cap")     //label para mostrar el monto maximo de energia permitido
 const luis_btnAnimation = d3.select("#luis-btnAnimation")
 
+//Variables para definir las dimensiones de la grafica
 const luis_margins = { left: 75, top: 40, right: 10, bottom: 50 }
 const luis_totalWidth = +luis_graph.style("width").slice(0, -2)
 const luis_totalHeight = (luis_totalWidth * 9) / 16
 const luis_width = luis_totalWidth - luis_margins.left - luis_margins.right
 const luis_height = luis_totalHeight - luis_margins.top - luis_margins.bottom
 
+//Creacion del SVG
 const luis_svg = luis_graph
     .append("svg")
     .attr("width", luis_totalWidth)
@@ -28,7 +30,7 @@ const luis_clip = luis_g
     .attr("width", luis_width)
     .attr("height", luis_height)
 
-const luis_year = luis_g
+const luis_date = luis_g
     .append("text")
     .attr("x", luis_width / 2)
     .attr("y", luis_height / 2)
@@ -49,17 +51,16 @@ const luis_continent = d3.scaleOrdinal().range(d3.schemeSet2)
 const luis_xAxis = d3.axisBottom(luis_x).tickSize(-luis_height)
 const luis_yAxis = d3.axisLeft(luis_y).tickSize(-luis_width)
 
-var luis_parseTime = d3.timeParse('%d/%M/%Y')
-
+//Variables para la transicion de la animacion. Definen la fecha actual, la minima y maxima
 var luis_iy, luis_miny, luis_maxy
 var luis_animating = false
 var luis_interval
 var luis_v_power_station
 
+//Carga de la data para la grafica y renderizado de la misma
 const luis_load = async () => {
     luis_data = await d3.csv(
         "https://raw.githubusercontent.com/MrLuisLagarda/unir_masters_degree/main/semestre-03/herramientas-de-visualizacion/Tarea-analisis-de-tendencias-d3/data/PowerGeneration.csv",
-        //d3.autoType
         function(d) {
             return {
                 dates: d.dates,
@@ -70,17 +71,21 @@ const luis_load = async () => {
             }
         }
     )
+    //Ignorando registros donde ambos valores sean nulos
     luis_data = d3.filter(luis_data, (d) => d.actual != null && d.expected != null)
 
+    //Asignando variables a los ejes y al radio del circulo
     luis_x.domain(d3.extent(luis_data, (d) => d.actual))
     luis_y.domain(d3.extent(luis_data, (d) => d.expected))
     luis_A.domain(d3.extent(luis_data, (d) => d.monitored_cap))
     luis_continent.domain(Array.from(new Set(luis_data.map((d) => d.power_station))))
 
+    //Definiendo valores minimos y maximos. la fecha que incrementa iniciara en el valor minimo
     luis_miny = d3.min(luis_data, (d) => moment(d.dates, 'M/D/yyyy'))
     luis_maxy = d3.max(luis_data, (d) => moment(d.dates, 'M/D/yyyy'))
     luis_iy = moment(luis_miny).format('M/D/yyyy')
     
+    //Añadiendo ejes y textos a la grafica
     luis_g.append("g")
         .attr("transform", `translate(0, ${luis_height})`)
         .attr("class", "axis")
@@ -105,12 +110,14 @@ const luis_load = async () => {
     luis_render(luis_data)
 }
 
+//Renderizado de las figuras(circulos). filtra la data que se tiene en base a la fecha actual (luis_iy)
 const luis_render = (luis_data) => {
     
     const luis_newData = d3.filter(luis_data, (d) => d.dates == luis_iy)
-
     const luis_circle = luis_g.selectAll("circle").data(luis_newData, (d) => d.power_station)
     
+    //Despliege del circulo comenzando con radio 0, con una animacion simple para que llege a su radio real
+    //Se dividio entre 2 la formula del radio ya que los circulos llegaban a ser muy grandes
     luis_circle
         .enter()
         .append("circle")
@@ -137,8 +144,11 @@ const luis_render = (luis_data) => {
         .attr("fill", "#ff000088")
         .remove()
 
-    luis_year.text(moment(luis_iy).format('DD/MMM/yyyy'))
+    //Despliegue de la fecha actual. Se utiliza moment.js para facilitar el manejo de fechas
+    luis_date.text(moment(luis_iy).format('DD/MMM/yyyy'))
 
+    //Si se tiene alguna planta de energia ya seleccionada, se escriben los valores correspondientes
+    //en los label. Simula una actualizacion de valores con forme avanza la animacion
     luis_d = luis_newData.filter((d) => d.power_station == luis_v_power_station)[0]
     if (luis_d != null) {
         luis_tooltip.style("left", x(d.actual) + "px").style("top", y(d.expected) + "px")
@@ -147,9 +157,9 @@ const luis_render = (luis_data) => {
     }
 }
 
+//Constante para mostrar el tooltip al dar click
 const luis_showTooltip = (d) => {
     luis_v_power_station = d.power_station
-
     luis_tooltip
         .style("left", luis_x(d.actual) + "px")
         .style("top", luis_y(d.expected) + "px")
@@ -158,17 +168,20 @@ const luis_showTooltip = (d) => {
     luis_monitored_cap.text(d.monitored_cap)
 }
 
+//Constante para ocultar el tooltip al dar click dentro del div de tooltip
 const luis_hideTooltip = () => {
     luis_tooltip.style("display", "none")
 }
 
+//constante para la animacion. Hace un incremento de 'd' dias hasta llegar al valor maximo o minimo.
+//la variable de entrada puede ser positiva o negativa
 const luis_delta = (d) => {
     luis_iy = moment(luis_iy, 'M/D/yyyy').add(d, 'd').format('M/D/yyyy')
     if (moment(luis_iy, 'M/D/yyyy') > luis_maxy) {
         clearInterval(luis_interval)
         luis_animating = false
         luis_btnAnimation
-            .classed("btn-success", true)
+            .classed("btn-primary", true)
             .classed("btn-danger", false)
             .html("<i class='fas fa-play'></i>")
         luis_iy = moment(luis_maxy).format('M/D/yyyy')
@@ -176,29 +189,28 @@ const luis_delta = (d) => {
     else if (moment(luis_iy, 'M/D/yyyy') < luis_miny) {
         luis_iy = moment(luis_miny).format('M/D/yyyy')
     }
-
     luis_render(luis_data)
 }
 
+//Constante para determinar si se reproduce o detiene la animacion
 const luis_toggleAnimation = () => {
     luis_animating = !luis_animating
     if (luis_animating) {
         luis_btnAnimation
-            .classed("btn-success", false)
+            .classed("btn-primary", false)
             .classed("btn-danger", true)
             .html("<i class='fas fa-pause'></i>")
-
         luis_interval = setInterval(() => luis_delta(1), 50)
     } else {
         luis_btnAnimation
-            .classed("btn-success", true)
+            .classed("btn-primary", true)
             .classed("btn-danger", false)
             .html("<i class='fas fa-play'></i>")
-
         clearInterval(luis_interval)
     }
 }
 
+//Funcion de inicializacion. En este caso solo hay una funcion que correr
 function luis_init() {
     luis_load()
 }
