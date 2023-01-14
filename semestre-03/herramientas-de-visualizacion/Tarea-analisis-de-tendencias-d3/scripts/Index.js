@@ -1,8 +1,8 @@
 //Variables  estaticas en codigo html
 const luis_graph = d3.select("#graph-expected-production")
-const luis_tooltip = d3.select("#luis-tooltip")                 //div con el tooltip que sera reposicionado segun sea necesario
-const luis_power_station = d3.select("#luis-power-station")     //label para especificar la planta de energia
-const luis_monitored_cap = d3.select("#luis-monitored-cap")     //label para mostrar el monto maximo de energia permitido
+const luis_tooltip = d3.select("#luis-tooltip")                 
+const luis_power_station = d3.select("#luis-power-station")     
+const luis_monitored_cap = d3.select("#luis-monitored-cap")   
 const luis_btnAnimation = d3.select("#luis-btnAnimation")
 
 //Variables para definir las dimensiones de la grafica
@@ -19,10 +19,12 @@ const luis_svg = luis_graph
     .attr("height", luis_totalHeight)
     .attr("class", "bg-figure")
 
+//Creando grupo
 const luis_g = luis_svg
     .append("g")
     .attr("transform", `translate(${luis_margins.left}, ${luis_margins.top})`)
 
+//Mascara para elementos que salgan del rectangulo
 const luis_clip = luis_g
     .append("clipPath")
     .attr("id", "clip")
@@ -30,12 +32,14 @@ const luis_clip = luis_g
     .attr("width", luis_width)
     .attr("height", luis_height)
 
+//Texto con la fecha de fondo
 const luis_date = luis_g
     .append("text")
     .attr("x", luis_width / 2)
     .attr("y", luis_height / 2)
     .attr("class", "bg-date-text")
 
+//Rectangulo
 luis_g.append("rect")
     .attr("x", "0")
     .attr("y", "0")
@@ -43,6 +47,7 @@ luis_g.append("rect")
     .attr("height", luis_height)
     .attr("class", "grp")
 
+//Definiendo rangos y colores
 const luis_x = d3.scaleLinear().range([0, luis_width])
 const luis_y = d3.scaleLinear().range([luis_height, 0])
 const luis_A = d3.scaleLinear().range([20, 70600])
