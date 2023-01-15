@@ -6,7 +6,7 @@ const luis_monitored_cap = d3.select("#luis-monitored-cap")
 const luis_btnAnimation = d3.select("#luis-btnAnimation")
 
 //Variables para definir las dimensiones de la grafica
-const luis_margins = { left: 75, top: 40, right: 10, bottom: 50 }
+const luis_margins = { left: 75, top: 50, right: 10, bottom: 50 }
 const luis_totalWidth = +luis_graph.style("width").slice(0, -2)
 const luis_totalHeight = (luis_totalWidth * 9) / 16
 const luis_width = luis_totalWidth - luis_margins.left - luis_margins.right
@@ -20,12 +20,12 @@ const luis_svg = luis_graph
     .attr("class", "bg-figure")
 
 //Creando grupo
-const luis_g = luis_svg
+const luis_group = luis_svg
     .append("g")
     .attr("transform", `translate(${luis_margins.left}, ${luis_margins.top})`)
 
 //Mascara para elementos que salgan del rectangulo
-const luis_clip = luis_g
+const luis_clip = luis_group
     .append("clipPath")
     .attr("id", "clip")
     .append("rect")
@@ -33,14 +33,14 @@ const luis_clip = luis_g
     .attr("height", luis_height)
 
 //Texto con la fecha de fondo
-const luis_date = luis_g
+const luis_date = luis_group
     .append("text")
     .attr("x", luis_width / 2)
     .attr("y", luis_height / 2)
     .attr("class", "bg-date-text")
 
 //Rectangulo
-luis_g.append("rect")
+luis_group.append("rect")
     .attr("x", "0")
     .attr("y", "0")
     .attr("width", luis_width)
@@ -50,12 +50,10 @@ luis_g.append("rect")
 //Definiendo rangos y colores
 const luis_x = d3.scaleLinear().range([0, luis_width])
 const luis_y = d3.scaleLinear().range([luis_height, 0])
-const luis_A = d3.scaleLinear().range([20, 70600])
+const luis_A = d3.scaleLinear().range([20, 22000])
 const luis_continent = d3.scaleOrdinal().range(d3.schemeSet2)
-
 const luis_xAxis = d3.axisBottom(luis_x).tickSize(-luis_height)
 const luis_yAxis = d3.axisLeft(luis_y).tickSize(-luis_width)
-
 //Variables para la transicion de la animacion. Definen la fecha actual, la minima y maxima
 var luis_iy, luis_miny, luis_maxy
 var luis_animating = false
@@ -64,8 +62,7 @@ var luis_v_power_station
 
 //Carga de la data para la grafica y renderizado de la misma
 const luis_load = async () => {
-    luis_data = await d3.csv(
-        "./data/PowerGeneration.csv",
+    luis_data = await d3.csv("./data/PowerGeneration.csv",
         function(d) {
             return {
                 dates: d.dates,
@@ -91,20 +88,27 @@ const luis_load = async () => {
     luis_iy = moment(luis_miny).format('M/D/yyyy')
     
     //Añadiendo ejes y textos a la grafica
-    luis_g.append("g")
+    luis_group.append("g")
         .attr("transform", `translate(0, ${luis_height})`)
         .attr("class", "axis")
         .call(luis_xAxis)
-    luis_g.append("g").attr("class", "axis").call(luis_yAxis)
+    luis_group.append("g").attr("class", "axis").call(luis_yAxis)
 
-    luis_g.append("text")
+    luis_group.append("text")
         .attr("x", (luis_width / 2)-75)
         .attr("y", luis_height + 40)
         .attr("text-widthr", "middle")
         .attr("class", "labels")
         .text("Energía Generada (MU)")
 
-    luis_g.append("g")
+    luis_group.append("text")
+        .attr("x", (luis_width / 2)-260)
+        .attr("y", -20)
+        .attr("text-widthr", "middle")
+        .attr("class", "labels")
+        .text("Energía Planeada VS Generada en el Paso del Tiempo")
+
+    luis_group.append("g")
         .attr("transform", `translate(-40, ${(luis_height / 2)+135})`)
         .append("text")
         .attr("transform", "rotate(-90)")
@@ -119,7 +123,7 @@ const luis_load = async () => {
 const luis_render = (luis_data) => {
     
     const luis_newData = d3.filter(luis_data, (d) => d.dates == luis_iy)
-    const luis_circle = luis_g.selectAll("circle").data(luis_newData, (d) => d.power_station)
+    const luis_circle = luis_group.selectAll("circle").data(luis_newData, (d) => d.power_station)
     
     //Despliege del circulo comenzando con radio 0, con una animacion simple para que llege a su radio real
     //Se dividio entre 2 la formula del radio ya que los circulos llegaban a ser muy grandes
