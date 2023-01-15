@@ -67,3 +67,24 @@ main>.container {
     font-size: 25px;
     font-family: "Fira Code";
 }
+
+
+/* CSS Sofia */
+
+
+
+.sofia_axis {
+    font-size: 20px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.sofia_axis line {
+    stroke-width: 2;
+    stroke: #ccc;
+    stroke-dasharray: 10 5;
+}
+
+.sofia_titulo {
+    font-size: 50px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}

@@ -1,6 +1,6 @@
 /******************************************************************* 
  * 
- *  Luis
+ *  Luis Martin Lagarda Méndez
  * 
  ******************************************************************/
 
@@ -221,11 +221,11 @@ const luis_toggleAnimation = () => {
 
 /******************************************************************* 
  * 
- *  Roberto
+ *  Roberto Carlos Guerrero de León
  * 
  ******************************************************************/
 // Selectores
-const roberto_graf = d3.select("#graf")
+const roberto_graf = d3.select("#roberto-graf")
 const roberto_margins = { top: 90, right: 10, bottom: 100, left: 150 }
 const roberto_anchoTotal = +roberto_graf.style("width").slice(0, -2)
 const roberto_altoTotal = (roberto_anchoTotal * 9) / 16
@@ -322,6 +322,70 @@ const roberto_render = (data) => {
     
 }
 
+/******************************************************************* 
+ * 
+ *  Sofia Miriam Juarez Becerril
+ * 
+ ******************************************************************/
+// Selectores
+const sofia_graf = d3.select("#sofia-graf")
+const sofia_margins = { top: 90, right: 10, bottom: 100, left: 150 }
+const sofia_anchoTotal = +sofia_graf.style("width").slice(0, -2)
+const sofia_altoTotal = (sofia_anchoTotal * 9) / 16
+const sofia_ancho = sofia_anchoTotal - sofia_margins.left - sofia_margins.right
+const sofia_alto = sofia_altoTotal - sofia_margins.top - sofia_margins.bottom
+
+// Variables de graficación
+const sofia_svg = sofia_graf
+  .append("svg")
+  .attr("width", sofia_anchoTotal)
+  .attr("height", sofia_altoTotal)
+  .attr("class", "fig")
+const sofia_g = sofia_svg
+  .append("g")
+  .attr("transform", `translate(${sofia_margins.left}, ${sofia_margins.top})`)
+
+sofia_g.append("rect").attr("width", sofia_ancho).attr("height", sofia_alto).attr("class", "bg")
+
+const sofia_x = d3.scaleLinear().range([0, sofia_ancho])
+const sofia_y = d3.scaleLinear().range([sofia_alto, 0])
+
+const sofia_xAxis = d3.axisBottom(sofia_x).ticks(5).tickSize(-sofia_alto)
+const sofia_yAxis = d3.axisLeft(sofia_y).tickSize(-sofia_ancho)
+
+const sofia_load = async () => {
+  var data = global_data; //await d3.csv("data/PowerGeneration_v3.csv", d3.autoType)
+
+  sofia_x.domain([0, d3.max(data, (d) => d.monitored_cap) * 1.1])
+  sofia_y.domain([0, d3.max(data, (d) => d.total_cap_under_maintenance) * 1.1])
+
+  sofia_g.append("g")
+    .attr("transform", `translate(0, ${sofia_alto})`)
+    .attr("class", "sofia_axis")
+    .call(sofia_xAxis)
+  sofia_g.append("g").attr("class", "sofia_axis").call(sofia_yAxis)
+
+  sofia_g.append("text")
+    .attr("x", sofia_ancho / 2)
+    .attr("y", -10)
+    .attr("class", "sofia_titulo")
+    .attr("text-anchor", "middle")
+    .text("Capacidad de energia (MegaWatt)")
+
+    sofia_render(data)
+}
+
+const sofia_render = (data) => {
+  sofia_g.selectAll("circle")
+    .data(data)
+    .enter()
+    .append("circle")
+    .attr("cx", (d) => sofia_x(d.monitored_cap))
+    .attr("cy", (d) => sofia_y(d.total_cap_under_maintenance))
+    .attr("r", 5)
+    .attr("fill", "#00b")
+}
+
 
 
 
@@ -359,6 +423,7 @@ const global_init = async() => {
     global_data = await d3.csv("./data/PowerGeneration.csv", d3.autoType)
     luis_load()
     roberto_load()
+    sofia_load()
 }
 
 global_init()
