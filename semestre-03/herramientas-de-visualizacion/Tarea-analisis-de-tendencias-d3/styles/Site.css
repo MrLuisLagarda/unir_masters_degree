@@ -16,12 +16,12 @@ main>.container {
     stroke: #00000099;
 }
 
-.axis {
+.luis_axis {
     font-size: 16px;
     font-family: "Arial";
 }
 
-.axis line {
+.luis_axis line {
     stroke-width: 1;
     stroke: #33333344;
     stroke-dasharray: 4 2;
@@ -40,3 +40,31 @@ main>.container {
     text-anchor: middle;
     dominant-baseline: middle;
 }
+
+/* CSS Roberto */
+
+.fig {
+    background-color: #ccc;
+    border: 1px solid #777;
+  }
+  
+  .bg {
+    fill: #ffffff88;
+  }
+  
+  .axis {
+    font-size: 25px;
+    font-family: "Fira Code";
+  }
+  
+  .axis line {
+    stroke-width: 2;
+    stroke: #ccc;
+    stroke-dasharray: 10 5;
+  }
+  
+  .titulo {
+    font-size: 25px;
+    font-family: "Fira Code";
+  }
+  

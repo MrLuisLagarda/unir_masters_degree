@@ -1,3 +1,12 @@
+/******************************************************************* 
+ * 
+ *  Luis
+ * 
+ ******************************************************************/
+
+//Variable global para descargar la data una sola vez
+var global_data = null;
+
 //Variables  estaticas en codigo html
 const luis_graph = d3.select("#graph-expected-production")
 const luis_tooltip = d3.select("#luis-tooltip")                 
@@ -62,17 +71,8 @@ var luis_v_power_station
 
 //Carga de la data para la grafica y renderizado de la misma
 const luis_load = async () => {
-    luis_data = await d3.csv("./data/PowerGeneration.csv",
-        function(d) {
-            return {
-                dates: d.dates,
-                power_station: d.power_station,
-                monitored_cap: d.monitored_cap,
-                expected: d.expected,
-                actual: d.actual
-            }
-        }
-    )
+    luis_data = global_data;//await d3.csv("./data/PowerGeneration.csv", d3.autoType)
+    
     //Ignorando registros donde ambos valores sean nulos
     luis_data = d3.filter(luis_data, (d) => d.actual != null && d.expected != null)
 
@@ -90,9 +90,9 @@ const luis_load = async () => {
     //Añadiendo ejes y textos a la grafica
     luis_group.append("g")
         .attr("transform", `translate(0, ${luis_height})`)
-        .attr("class", "axis")
+        .attr("class", "luis_axis")
         .call(luis_xAxis)
-    luis_group.append("g").attr("class", "axis").call(luis_yAxis)
+    luis_group.append("g").attr("class", "luis_axis").call(luis_yAxis)
 
     luis_group.append("text")
         .attr("x", (luis_width / 2)-75)
@@ -219,9 +219,146 @@ const luis_toggleAnimation = () => {
     }
 }
 
-//Funcion de inicializacion. En este caso solo hay una funcion que correr
-function luis_init() {
-    luis_load()
+/******************************************************************* 
+ * 
+ *  Roberto
+ * 
+ ******************************************************************/
+// Selectores
+const roberto_graf = d3.select("#graf")
+const roberto_margins = { top: 90, right: 10, bottom: 100, left: 150 }
+const roberto_anchoTotal = +roberto_graf.style("width").slice(0, -2)
+const roberto_altoTotal = (roberto_anchoTotal * 9) / 16
+const roberto_ancho = roberto_anchoTotal - roberto_margins.left - roberto_margins.right
+const roberto_alto = roberto_altoTotal - roberto_margins.top - roberto_margins.bottom
+
+// Variables de graficación
+const roberto_svg = roberto_graf
+  .append("svg")
+  .attr("width", roberto_anchoTotal)
+  .attr("height", roberto_altoTotal)
+  .attr("class", "fig")
+const roberto_g = roberto_svg
+  .append("g")
+  .attr("transform", `translate(${roberto_margins.left}, ${roberto_margins.top})`)
+
+roberto_g.append("rect")
+.attr("width", roberto_ancho)
+.attr("height", roberto_alto)
+.attr("class", "bg")
+
+const roberto_x = d3.scaleLinear().range([0, roberto_ancho])
+const roberto_y = d3.scaleLinear().range([roberto_alto, 0])
+
+const roberto_xAxis = d3.axisBottom(roberto_x).ticks(5).tickSize(-roberto_alto)
+const roberto_yAxis = d3.axisLeft(roberto_y).tickSize(-roberto_ancho)
+
+const roberto_load = async () => {
+  var data = global_data;//await d3.csv("./data/PowerGeneration.csv", d3.autoType)
+  
+  roberto_x.domain([0, d3.max(data, (d) => d.total_cap_under_maintenance) * 1.1])
+  roberto_y.domain([0, d3.max(data, (d) => d.planned_maintenance) * 1.1])
+  roberto_g.append("text")
+  .attr("text-anchor", "end")
+  .attr("transform", "rotate(-90)")
+  .attr("y", -120)
+  .attr("x", -190)
+  .text("Planned Maintanence")
+
+roberto_g.append("text")
+  .attr("text-anchor", "end")
+  .attr("x", 600)
+  .attr("y", 600)
+  .text("Total Cap Under Maintenace");  
+  roberto_g.append("g")
+    .attr("transform", `translate(0, ${roberto_alto})`)
+    .attr("class", "axis")
+    .call(roberto_xAxis)
+  roberto_g.append("g").attr("class", "axis").call(roberto_yAxis)
+
+  roberto_g.append("text")
+    .attr("x", roberto_ancho / 2)
+    .attr("y", -10)
+    .attr("class", "titulo")
+    .attr("text-anchor", "middle")
+    .text("Total Cap. Under Maintenace (MW) vs. Planned Maintanence (MW)")
+
+  roberto_render(data)
+}
+var color = d3.scaleOrdinal()
+.domain(["TotalCapUnderMaintenace", "PlannedMaintanence" ])
+.range([ "#F8766D", "#00BA38"])
+
+function updatePlot() {
+
+  // Get the value of the button
+  xlim = this.value
+
+  // Update X axis
+  x.domain([3,xlim])
+  xAxis.transition().duration(1000).call(d3.axisBottom(x))
+
+  // Update chart
+  roberto_g.selectAll("circle")
+     .data(data)
+     .transition()
+     .duration(1000)
+     .attr("cx", (d) => x(d.total_cap_under_maintenance))
+     .attr("cy", (d) => y(d.planned_maintenance))
 }
 
-luis_init()
+// Add an event listener to the button created in the html part
+d3.select("#buttonXlim").on("input", updatePlot )
+
+const roberto_render = (data) => {
+  roberto_g.selectAll("circle")
+    .data(data)
+    .enter()
+    .append("circle")
+    .attr("cx", (d) => roberto_x(d.total_cap_under_maintenance))
+    .attr("cy", (d) => roberto_y(d.planned_maintenance))
+    .attr("r", 5)
+    .attr("fill", "#00c")
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/******************************************************************* 
+ * 
+ *  Luis - Generalizado de data para solo descargarla una vez
+ * 
+ ******************************************************************/
+
+//Funcion de inicializacion. En este caso solo hay una funcion que correr
+const global_init = async() => {
+    global_data = await d3.csv("./data/PowerGeneration.csv", d3.autoType)
+    luis_load()
+    roberto_load()
+}
+
+global_init()
