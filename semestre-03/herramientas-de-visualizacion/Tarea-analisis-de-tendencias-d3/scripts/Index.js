@@ -6,12 +6,13 @@
 
 //Variable global para descargar la data una sola vez
 var global_data = null;
+var global_data_trimester = null;
 
 //Variables  estaticas en codigo html
 const luis_graph = d3.select("#graph-expected-production")
-const luis_tooltip = d3.select("#luis-tooltip")                 
-const luis_power_station = d3.select("#luis-power-station")     
-const luis_monitored_cap = d3.select("#luis-monitored-cap")   
+const luis_tooltip = d3.select("#luis-tooltip")
+const luis_power_station = d3.select("#luis-power-station")
+const luis_monitored_cap = d3.select("#luis-monitored-cap")
 const luis_btnAnimation = d3.select("#luis-btnAnimation")
 
 //Variables para definir las dimensiones de la grafica
@@ -72,7 +73,7 @@ var luis_v_power_station
 //Carga de la data para la grafica y renderizado de la misma
 const luis_load = async () => {
     luis_data = global_data;//await d3.csv("./data/PowerGeneration.csv", d3.autoType)
-    
+
     //Ignorando registros donde ambos valores sean nulos
     luis_data = d3.filter(luis_data, (d) => d.actual != null && d.expected != null)
 
@@ -86,7 +87,7 @@ const luis_load = async () => {
     luis_miny = d3.min(luis_data, (d) => moment(d.dates, 'M/D/yyyy'))
     luis_maxy = d3.max(luis_data, (d) => moment(d.dates, 'M/D/yyyy'))
     luis_iy = moment(luis_miny).format('M/D/yyyy')
-    
+
     //Añadiendo ejes y textos a la grafica
     luis_group.append("g")
         .attr("transform", `translate(0, ${luis_height})`)
@@ -95,21 +96,21 @@ const luis_load = async () => {
     luis_group.append("g").attr("class", "luis_axis").call(luis_yAxis)
 
     luis_group.append("text")
-        .attr("x", (luis_width / 2)-75)
+        .attr("x", (luis_width / 2) - 75)
         .attr("y", luis_height + 40)
         .attr("text-widthr", "middle")
         .attr("class", "luis_labels")
         .text("Energía Generada (MU)")
 
     luis_group.append("text")
-        .attr("x", (luis_width / 2)-260)
+        .attr("x", (luis_width / 2) - 260)
         .attr("y", -20)
         .attr("text-widthr", "middle")
         .attr("class", "luis_labels")
         .text("Energía Planeada VS Generada en el Paso del Tiempo")
 
     luis_group.append("g")
-        .attr("transform", `translate(-40, ${(luis_height / 2)+135})`)
+        .attr("transform", `translate(-40, ${(luis_height / 2) + 135})`)
         .append("text")
         .attr("transform", "rotate(-90)")
         .attr("text-widthr", "middle")
@@ -121,10 +122,10 @@ const luis_load = async () => {
 
 //Renderizado de las figuras(circulos). filtra la data que se tiene en base a la fecha actual (luis_iy)
 const luis_render = (luis_data) => {
-    
+
     const luis_newData = d3.filter(luis_data, (d) => d.dates == luis_iy)
     const luis_circle = luis_group.selectAll("circle").data(luis_newData, (d) => d.power_station)
-    
+
     //Despliege del circulo comenzando con radio 0, con una animacion simple para que llege a su radio real
     //Se dividio entre 2 la formula del radio ya que los circulos llegaban a ser muy grandes
     luis_circle
@@ -142,7 +143,7 @@ const luis_render = (luis_data) => {
         .duration(250)
         .attr("cx", (d) => luis_x(d.actual))
         .attr("cy", (d) => luis_y(d.expected))
-        .attr("r", (d) => Math.sqrt((luis_A(d.monitored_cap) /2 )/ Math.PI))
+        .attr("r", (d) => Math.sqrt((luis_A(d.monitored_cap) / 2) / Math.PI))
         .attr("fill", (d) => luis_continent(d.power_station) + "88")
 
     luis_circle
@@ -234,18 +235,18 @@ const roberto_alto = roberto_altoTotal - roberto_margins.top - roberto_margins.b
 
 // Variables de graficación
 const roberto_svg = roberto_graf
-  .append("svg")
-  .attr("width", roberto_anchoTotal)
-  .attr("height", roberto_altoTotal)
-  .attr("class", "fig")
+    .append("svg")
+    .attr("width", roberto_anchoTotal)
+    .attr("height", roberto_altoTotal)
+    .attr("class", "fig")
 const roberto_g = roberto_svg
-  .append("g")
-  .attr("transform", `translate(${roberto_margins.left}, ${roberto_margins.top})`)
+    .append("g")
+    .attr("transform", `translate(${roberto_margins.left}, ${roberto_margins.top})`)
 
 roberto_g.append("rect")
-.attr("width", roberto_ancho)
-.attr("height", roberto_alto)
-.attr("class", "bg")
+    .attr("width", roberto_ancho)
+    .attr("height", roberto_alto)
+    .attr("class", "bg")
 
 const roberto_x = d3.scaleLinear().range([0, roberto_ancho])
 const roberto_y = d3.scaleLinear().range([roberto_alto, 0])
@@ -254,72 +255,72 @@ const roberto_xAxis = d3.axisBottom(roberto_x).ticks(5).tickSize(-roberto_alto)
 const roberto_yAxis = d3.axisLeft(roberto_y).tickSize(-roberto_ancho)
 
 const roberto_load = async () => {
-  var data = global_data;//await d3.csv("./data/PowerGeneration.csv", d3.autoType)
-  
-  roberto_x.domain([0, d3.max(data, (d) => d.total_cap_under_maintenance) * 1.1])
-  roberto_y.domain([0, d3.max(data, (d) => d.planned_maintenance) * 1.1])
-  roberto_g.append("text")
-  .attr("text-anchor", "end")
-  .attr("transform", "rotate(-90)")
-  .attr("y", -120)
-  .attr("x", -190)
-  .text("Planned Maintanence")
+    var data = global_data;//await d3.csv("./data/PowerGeneration.csv", d3.autoType)
 
-roberto_g.append("text")
-  .attr("text-anchor", "end")
-  .attr("x", 600)
-  .attr("y", 600)
-  .text("Total Cap Under Maintenace");  
-  roberto_g.append("g")
-    .attr("transform", `translate(0, ${roberto_alto})`)
-    .attr("class", "axis")
-    .call(roberto_xAxis)
-  roberto_g.append("g").attr("class", "axis").call(roberto_yAxis)
+    roberto_x.domain([0, d3.max(data, (d) => d.total_cap_under_maintenance) * 1.1])
+    roberto_y.domain([0, d3.max(data, (d) => d.planned_maintenance) * 1.1])
+    roberto_g.append("text")
+        .attr("text-anchor", "end")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -120)
+        .attr("x", -190)
+        .text("Planned Maintanence")
 
-  roberto_g.append("text")
-    .attr("x", roberto_ancho / 2)
-    .attr("y", -10)
-    .attr("class", "titulo")
-    .attr("text-anchor", "middle")
-    .text("Total Cap. Under Maintenace (MW) vs. Planned Maintanence (MW)")
+    roberto_g.append("text")
+        .attr("text-anchor", "end")
+        .attr("x", 600)
+        .attr("y", 600)
+        .text("Total Cap Under Maintenace");
+    roberto_g.append("g")
+        .attr("transform", `translate(0, ${roberto_alto})`)
+        .attr("class", "axis")
+        .call(roberto_xAxis)
+    roberto_g.append("g").attr("class", "axis").call(roberto_yAxis)
 
-  roberto_render(data)
+    roberto_g.append("text")
+        .attr("x", roberto_ancho / 2)
+        .attr("y", -10)
+        .attr("class", "titulo")
+        .attr("text-anchor", "middle")
+        .text("Total Cap. Under Maintenace (MW) vs. Planned Maintanence (MW)")
+
+    roberto_render(data)
 }
 var color = d3.scaleOrdinal()
-.domain(["TotalCapUnderMaintenace", "PlannedMaintanence" ])
-.range([ "#F8766D", "#00BA38"])
+    .domain(["TotalCapUnderMaintenace", "PlannedMaintanence"])
+    .range(["#F8766D", "#00BA38"])
 
 function updatePlot() {
 
-  // Get the value of the button
-  xlim = this.value
+    // Get the value of the button
+    xlim = this.value
 
-  // Update X axis
-  x.domain([3,xlim])
-  xAxis.transition().duration(1000).call(d3.axisBottom(x))
+    // Update X axis
+    x.domain([3, xlim])
+    xAxis.transition().duration(1000).call(d3.axisBottom(x))
 
-  // Update chart
-  roberto_g.selectAll("circle")
-     .data(data)
-     .transition()
-     .duration(1000)
-     .attr("cx", (d) => x(d.total_cap_under_maintenance))
-     .attr("cy", (d) => y(d.planned_maintenance))
+    // Update chart
+    roberto_g.selectAll("circle")
+        .data(data)
+        .transition()
+        .duration(1000)
+        .attr("cx", (d) => x(d.total_cap_under_maintenance))
+        .attr("cy", (d) => y(d.planned_maintenance))
 }
 
 // Add an event listener to the button created in the html part
-d3.select("#buttonXlim").on("input", updatePlot )
+d3.select("#buttonXlim").on("input", updatePlot)
 
 const roberto_render = (data) => {
-  roberto_g.selectAll("circle")
-    .data(data)
-    .enter()
-    .append("circle")
-    .attr("cx", (d) => roberto_x(d.total_cap_under_maintenance))
-    .attr("cy", (d) => roberto_y(d.planned_maintenance))
-    .attr("r", 5)
-    .attr("fill", "#00c")
-    
+    roberto_g.selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("cx", (d) => roberto_x(d.total_cap_under_maintenance))
+        .attr("cy", (d) => roberto_y(d.planned_maintenance))
+        .attr("r", 5)
+        .attr("fill", "#00c")
+
 }
 
 /******************************************************************* 
@@ -337,13 +338,13 @@ const sofia_alto = sofia_altoTotal - sofia_margins.top - sofia_margins.bottom
 
 // Variables de graficación
 const sofia_svg = sofia_graf
-  .append("svg")
-  .attr("width", sofia_anchoTotal)
-  .attr("height", sofia_altoTotal)
-  .attr("class", "fig")
+    .append("svg")
+    .attr("width", sofia_anchoTotal)
+    .attr("height", sofia_altoTotal)
+    .attr("class", "fig")
 const sofia_g = sofia_svg
-  .append("g")
-  .attr("transform", `translate(${sofia_margins.left}, ${sofia_margins.top})`)
+    .append("g")
+    .attr("transform", `translate(${sofia_margins.left}, ${sofia_margins.top})`)
 
 sofia_g.append("rect").attr("width", sofia_ancho).attr("height", sofia_alto).attr("class", "bg")
 
@@ -354,62 +355,134 @@ const sofia_xAxis = d3.axisBottom(sofia_x).ticks(5).tickSize(-sofia_alto)
 const sofia_yAxis = d3.axisLeft(sofia_y).tickSize(-sofia_ancho)
 
 const sofia_load = async () => {
-  var data = global_data; //await d3.csv("data/PowerGeneration_v3.csv", d3.autoType)
+    var data = global_data; //await d3.csv("data/PowerGeneration_v3.csv", d3.autoType)
 
-  sofia_x.domain([0, d3.max(data, (d) => d.monitored_cap) * 1.1])
-  sofia_y.domain([0, d3.max(data, (d) => d.total_cap_under_maintenance) * 1.1])
+    sofia_x.domain([0, d3.max(data, (d) => d.monitored_cap) * 1.1])
+    sofia_y.domain([0, d3.max(data, (d) => d.total_cap_under_maintenance) * 1.1])
 
-  sofia_g.append("g")
-    .attr("transform", `translate(0, ${sofia_alto})`)
-    .attr("class", "sofia_axis")
-    .call(sofia_xAxis)
-  sofia_g.append("g").attr("class", "sofia_axis").call(sofia_yAxis)
+    sofia_g.append("g")
+        .attr("transform", `translate(0, ${sofia_alto})`)
+        .attr("class", "sofia_axis")
+        .call(sofia_xAxis)
+    sofia_g.append("g").attr("class", "sofia_axis").call(sofia_yAxis)
 
-  sofia_g.append("text")
-    .attr("x", sofia_ancho / 2)
-    .attr("y", -10)
-    .attr("class", "sofia_titulo")
-    .attr("text-anchor", "middle")
-    .text("Capacidad de energia (MegaWatt)")
+    sofia_g.append("text")
+        .attr("x", sofia_ancho / 2)
+        .attr("y", -10)
+        .attr("class", "sofia_titulo")
+        .attr("text-anchor", "middle")
+        .text("Capacidad de energia (MegaWatt)")
 
     sofia_render(data)
 }
 
 const sofia_render = (data) => {
-  sofia_g.selectAll("circle")
-    .data(data)
-    .enter()
-    .append("circle")
-    .attr("cx", (d) => sofia_x(d.monitored_cap))
-    .attr("cy", (d) => sofia_y(d.total_cap_under_maintenance))
-    .attr("r", 5)
-    .attr("fill", "#00b")
+    sofia_g.selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("cx", (d) => sofia_x(d.monitored_cap))
+        .attr("cy", (d) => sofia_y(d.total_cap_under_maintenance))
+        .attr("r", 5)
+        .attr("fill", "#00b")
 }
 
+/******************************************************************* 
+ * 
+ *  Laura Guadalupe Torrejon Pastor
+ * 
+ ******************************************************************/
+// Dimensiones y margen del grafico
+var laura_margin = { top: 10, right: 30, bottom: 100, left: 60 },
+    laura_width = 900 - laura_margin.left - laura_margin.right,
+    laura_height = 400 - laura_margin.top - laura_margin.bottom;
+
+// Declaracion de svg
+var laura_svg = d3.select("#laura-my_dataviz")
+    .append("svg")
+    .attr("width", laura_width + laura_margin.left + laura_margin.right)
+    .attr("height", laura_height + laura_margin.top + laura_margin.bottom)
+    .append("g")
+    .attr("transform",
+        "translate(" + laura_margin.left + "," + laura_margin.top + ")");
+
+var laura_svg2 = d3.select("#laura-my_dataviz2")
+    .append("svg")
+    .attr("width", laura_width + laura_margin.left + laura_margin.right)
+    .attr("height", laura_height + laura_margin.top + laura_margin.bottom)
+    .append("g")
+    .attr("transform",
+        "translate(" + laura_margin.left + "," + laura_margin.top + ")");
 
 
+const laura_load = async () => {
+    // Carga de la base de datos
+    data = global_data_trimester;
+    var x = d3.scaleBand()
+        .range([0, laura_width])
+        .domain(data.map(function (d) { return d.Trimester; }))
+        .padding(0.3);
 
+    laura_svg.append("g")
+        .attr("transform", "translate(0," + laura_height + ")")
+        .call(d3.axisBottom(x))
+        .selectAll("text")
+        .attr("transform", "translate(-20,0)rotate(-85)")
+        .style("text-anchor", "end");
 
+    // Eje Y
+    var y = d3.scaleLinear()
+        .domain([0, 10000000])
+        .range([laura_height, 30]);
+    laura_svg.append("g")
+        .call(d3.axisLeft(y));
 
+    // Grafico de barras
+    laura_svg.selectAll("mybar")
 
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("x", function (d) { return x(d.Trimester); })
+        .attr("y", function (d) { return y(d.Planned_Maintanence); })
+        .attr("width", x.bandwidth())
+        .attr("height", function (d) { return laura_height - y(d.Planned_Maintanence); })
+        .attr("fill", "#ec7d7f")
+}
 
+const laura_load2 = async () => {
+    // Carga de la base de datos
+    data = global_data_trimester;
+    var x = d3.scaleBand()
+        .range([0, laura_width])
+        .domain(data.map(function (d) { return d.Trimester; }))
+        .padding(0.3);
 
+    laura_svg2.append("g")
+        .attr("transform", "translate(0," + laura_height + ")")
+        .call(d3.axisBottom(x))
+        .selectAll("text")
+        .attr("transform", "translate(-20,0)rotate(-85)")
+        .style("text-anchor", "end");
 
+    // Eje Y
+    var y = d3.scaleLinear()
+        .domain([0, 2000000])
+        .range([laura_height, 30]);
+    laura_svg2.append("g")
+        .call(d3.axisLeft(y));
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    // Grafico de barras
+    laura_svg2.selectAll("mybar")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("x", function (d) { return x(d.Trimester); })
+        .attr("y", function (d) { return y(d.Forced_Maintanence); })
+        .attr("width", x.bandwidth())
+        .attr("height", function (d) { return laura_height - y(d.Forced_Maintanence); })
+        .attr("fill", "#2d6d5e")
+}
 
 
 /******************************************************************* 
@@ -419,11 +492,14 @@ const sofia_render = (data) => {
  ******************************************************************/
 
 //Funcion de inicializacion. En este caso solo hay una funcion que correr
-const global_init = async() => {
+const global_init = async () => {
     global_data = await d3.csv("./data/PowerGeneration.csv", d3.autoType)
+    global_data_trimester = await d3.csv("./data/7_OneCatOneNum_header.csv", d3.autoType)
     luis_load()
     roberto_load()
     sofia_load()
+    laura_load()
+    laura_load2()
 }
 
 global_init()
