@@ -27,7 +27,7 @@ main>.container {
     stroke-dasharray: 4 2;
 }
 
-.labels {
+.luis_labels {
     font-size: 20px;
     font-family: "Arial";
 }
@@ -38,7 +38,7 @@ main>.container {
     font-weight: bold;
     fill: #bbb;
     text-anchor: middle;
-    dominant-baseline: middle;
+    /* dominant-baseline: middle; */
 }
 
 /* CSS Roberto */
@@ -46,25 +46,24 @@ main>.container {
 .fig {
     background-color: #ccc;
     border: 1px solid #777;
-  }
-  
-  .bg {
+}
+
+.bg {
     fill: #ffffff88;
-  }
-  
-  .axis {
+}
+
+.axis {
     font-size: 25px;
     font-family: "Fira Code";
-  }
-  
-  .axis line {
+}
+
+.axis line {
     stroke-width: 2;
     stroke: #ccc;
     stroke-dasharray: 10 5;
-  }
-  
-  .titulo {
+}
+
+.titulo {
     font-size: 25px;
     font-family: "Fira Code";
-  }
-  
+}

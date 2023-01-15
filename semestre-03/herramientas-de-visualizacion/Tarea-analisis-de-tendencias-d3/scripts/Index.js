@@ -98,14 +98,14 @@ const luis_load = async () => {
         .attr("x", (luis_width / 2)-75)
         .attr("y", luis_height + 40)
         .attr("text-widthr", "middle")
-        .attr("class", "labels")
+        .attr("class", "luis_labels")
         .text("Energía Generada (MU)")
 
     luis_group.append("text")
         .attr("x", (luis_width / 2)-260)
         .attr("y", -20)
         .attr("text-widthr", "middle")
-        .attr("class", "labels")
+        .attr("class", "luis_labels")
         .text("Energía Planeada VS Generada en el Paso del Tiempo")
 
     luis_group.append("g")
@@ -113,7 +113,7 @@ const luis_load = async () => {
         .append("text")
         .attr("transform", "rotate(-90)")
         .attr("text-widthr", "middle")
-        .attr("class", "labels")
+        .attr("class", "luis_labels")
         .text("Energía que se Planeó Generar (MU)")
 
     luis_render(luis_data)
