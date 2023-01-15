@@ -65,7 +65,7 @@ var luis_v_power_station
 //Carga de la data para la grafica y renderizado de la misma
 const luis_load = async () => {
     luis_data = await d3.csv(
-        "/data/PowerGeneration.csv",
+        "./data/PowerGeneration.csv",
         function(d) {
             return {
                 dates: d.dates,
